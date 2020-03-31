@@ -209,12 +209,6 @@ function checkCollision(o) {
                 let dx = o1.x - o2.x;
                 let dy = o1.y - o2.y;
                 let d = Math.sqrt(dx ** 2 + dy ** 2);
-
-
-                window.teta1 = Math.atan(o1.vx / o1.vy);// угол движения
-                window.teta2 = Math.atan(o2.vx / o2.vy);///
-              //   console.log(teta1*180/Math.PI);
-               //  console.log(teta2*180/Math.PI);
                 if (d < o1.r + o2.r) {
 
 
@@ -227,15 +221,12 @@ function checkCollision(o) {
                     let dimpy = impulse1y + impulse2y;
                     let newvx = dimpx / (o1.m + o2.m);
                     let newvy = dimpy / (o1.m + o2.m);
-                    //   console.log(newvx);
-                    //   console.log(newvy);
 
 
                     let fi = 0;
                     let teta1 = Math.atan(o1.vx / o1.vy);// угол движения
                     let teta2 = Math.atan(o2.vx / o2.vy);///
-                     console.log(teta1*180/Math.PI);
-                     console.log(teta2*180/Math.PI);
+
                     let v1x = o1.vx;
                     let v2x = o2.vx;
                     let v1y = o1.vy;
@@ -248,54 +239,17 @@ function checkCollision(o) {
                     let v1sx = ((v1x * Math.cos(teta1 - fi) * (dm) + 2 * m2 * v2x * Math.cos(teta2 - fi)) / (dm)) * Math.cos(fi) + v1x * Math.sin(teta1 - fi) * Math.cos(fi + Math.PI / 2);
                     let v1sy = ((v1y * Math.cos(teta1 - fi) * (dm) + 2 * m2 * v2y * Math.cos(teta2 - fi)) / (dm)) * Math.sin(fi) + v1y * Math.sin(teta1 - fi) * Math.sin(fi + Math.PI / 2);
 
-                    //let v2sx = ((v2x * Math.cos(teta1 - fi) * (dm) + 2 * m1 * v1x * Math.cos(teta2 - fi)) / (dm)) * Math.cos(fi) + v2x * Math.sin(teta1 - fi) * Math.cos(fi + Math.PI / 2);
-                   // let v2sy = ((v2y * Math.cos(teta1 - fi) * (dm) + 2 * m1 * v1y * Math.cos(teta2 - fi)) / (dm)) * Math.sin(fi) + v2y * Math.sin(teta1 - fi) * Math.sin(fi + Math.PI / 2);
+                    
+
                     let v2sx = ((v2x * Math.cos(teta2 - fi) * (dm) + 2 * m1 * v1x * Math.cos(teta1 - fi)) / (dm)) * Math.cos(fi) + v2x * Math.sin(teta2 - fi) * Math.cos(fi + Math.PI / 2);
                     let v2sy = ((v2y * Math.cos(teta2 - fi) * (dm) + 2 * m1 * v1y * Math.cos(teta1 - fi)) / (dm)) * Math.sin(fi) + v2y * Math.sin(teta2 - fi) * Math.sin(fi + Math.PI / 2);
-                    console.log(v1sx, v1sy);
-
-                    console.log(v2sx, v2sy);
-
                     o1.vx = v1sx;
                     o1.vy = v1sy;
                     o2.vx = v2sx;
                     o2.vy = v2sy;
-                    if (o1.m > o2.m) {
-
-
-                   //     o1.vx = v1sx;
-                   //     o1.vy = v1sy;
-                        
-                       /* if(o2.m <= 0){
-                            o2.m -= 1;
-                            o1.m += 1;
-                        }else{
-                            o.splice(j, 1);
-                        }*/
-                        
-                     //   o2.r = o2.m;
-                       // o1.r = o1.m;
-                        // o[j].m -= 1;
+                    if (o1.m > o2.m) {                
                         // o.splice(j, 1);
                     } else {
-
-                     //   o2.vx = v2sx;
-                    //    o2.vy = v2sy;
-                        /*if(o1.m <= 0){
-                            o1.m -= 1;
-                            o2.m += 1;
-
-                        }else{
-                            o.splice(i, 1);
-
-                        }*/
-                        
-
-                        
-
-                       // o2.r = o2.m;
-                       // o1.r = o1.m;
-
                        //  o.splice(i, 1);
                     }
                 }
