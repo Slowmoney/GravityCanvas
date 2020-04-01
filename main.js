@@ -35,12 +35,21 @@ var planet = {
 }
 
 var G = 1;
-var T = 1;
+//var T = 1;
 var anim = true;
 function main() {
+
+
+
+
     window.canvas = document.getElementById("canvas");
     window.ctx = window.canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+
+
+
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
     //drawCircle(obj[0].x, obj[0].y, 4);
     window.obj = [];
     // window.obj.push(new Shape({ "mass": 100, x: 500, y: 500, vx: 0, vy:1, ax: 0, ay: 0 , radius : 1}));
@@ -76,7 +85,7 @@ function main() {
 
     });
     window.canvas.addEventListener("mouseup", e => {
-        let size = (new Date().getTime() - hold) / 10;
+        let size = (new Date().getTime() - hold) / 100;
 
         objectsToDraw[0] = 0;
         objectsToDraw[1] = 0;
@@ -85,7 +94,7 @@ function main() {
 
         //  console.log(e.clientX-preve.clientX);
         //  console.log(e.clientY-preve.clientY);
-        window.obj.push(new Shape({ "mass": size, x: preve.offsetX, y: preve.offsetY, vx: (e.offsetX - preve.offsetX) / 10, vy: (e.offsetY - preve.offsetY) / 10, ax: 0, ay: 0, radius: size }));
+        window.obj.push(new Shape({ "mass": size, x: preve.offsetX, y: preve.offsetY, vx: (e.offsetX - preve.offsetX) / 2, vy: (e.offsetY - preve.offsetY) / 2, ax: 0, ay: 0, radius: size }));
 
 
     });
@@ -144,11 +153,14 @@ window.countFPS = (function () {
 var T = 0.1;
 var objectsToDraw = [0, 0, 0, 0];
 
+
 function update(dt) {
 
     document.querySelector(".fps").innerText = countFPS();
-
+    ctx.save();
+    ctx.fillStyle = 'rgba(8,8, 255, 0.6)';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
     if (objectsToDraw[0] != 0) {
 
         drawLine(objectsToDraw[0], objectsToDraw[1], objectsToDraw[2], objectsToDraw[3]);
@@ -204,7 +216,7 @@ function checkCollision(o) {
     for (let [i, o1] of o.entries()) {
 
         for (let [j, o2] of o.entries()) {
-            
+
             if (i < j) {
                 let dx = o1.x - o2.x;
                 let dy = o1.y - o2.y;
@@ -239,7 +251,7 @@ function checkCollision(o) {
                     let v1sx = ((v1x * Math.cos(teta1 - fi) * (dm) + 2 * m2 * v2x * Math.cos(teta2 - fi)) / (dm)) * Math.cos(fi) + v1x * Math.sin(teta1 - fi) * Math.cos(fi + Math.PI / 2);
                     let v1sy = ((v1y * Math.cos(teta1 - fi) * (dm) + 2 * m2 * v2y * Math.cos(teta2 - fi)) / (dm)) * Math.sin(fi) + v1y * Math.sin(teta1 - fi) * Math.sin(fi + Math.PI / 2);
 
-                    
+
 
                     let v2sx = ((v2x * Math.cos(teta2 - fi) * (dm) + 2 * m1 * v1x * Math.cos(teta1 - fi)) / (dm)) * Math.cos(fi) + v2x * Math.sin(teta2 - fi) * Math.cos(fi + Math.PI / 2);
                     let v2sy = ((v2y * Math.cos(teta2 - fi) * (dm) + 2 * m1 * v1y * Math.cos(teta1 - fi)) / (dm)) * Math.sin(fi) + v2y * Math.sin(teta2 - fi) * Math.sin(fi + Math.PI / 2);
@@ -247,10 +259,10 @@ function checkCollision(o) {
                     o1.vy = v1sy;
                     o2.vx = v2sx;
                     o2.vy = v2sy;
-                    if (o1.m > o2.m) {                
-                        // o.splice(j, 1);
+                    if (o1.m > o2.m) {
+                        o.splice(j, 1);
                     } else {
-                       //  o.splice(i, 1);
+                        o.splice(i, 1);
                     }
                 }
 
@@ -288,6 +300,7 @@ class Shape {
         this.vy = param.vy;
         this.fx = 0;
         this.fy = 0;
+        this.track = [];
     }
 
     move(dt) {
@@ -310,12 +323,56 @@ class Shape {
     }
 
     draw() {
-        ctx.beginPath();
+
+
+
+
+        if (this.track.length >= 100) {
+            this.track.shift([this.x, this.y]);
+        }
+        this.track.push([this.x, this.y]);
+
+       
+
+        try {
+            ctx.beginPath();
+
+
+            for (let i = 0; i < this.track.length; i++) {
+                // this.drawCircle(this.track[i][0], this.track[i][1], 1);
+
+
+                ctx.moveTo(this.track[i][0], this.track[i][1]);
+                ctx.arc(this.track[i][0], this.track[i][1], 1, 0, Math.PI * 2, false);
+            }
+
+
+            //  this.drawCurve(this.x,this.y,this.track[this.track.length - 1][0],this.track[this.track.length - 1][1],this.track[50][0],this.track[50][1]);
+        } catch (error) {
+            console.log(error);
+        }
+
+
+
+        //this.drawCircle(this.x, this.y, this.r);
+        ctx.moveTo(this.x, this.y);
         ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+        ctx.fillText([Math.floor(this.x), Math.floor(this.y)], this.x + this.r + 10, this.y);
         ctx.closePath();
         ctx.fill();
     }
-
+    drawCurve(otx, oty, kx, ky, cx, cy) {
+        ctx.beginPath();
+        ctx.moveTo(otx, oty);
+        ctx.quadraticCurveTo(cx, cy, kx, ky);
+        ctx.stroke();
+    }
+    drawCircle(x, y, r) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2, false);
+        ctx.closePath();
+        ctx.fill();
+    }
 
 
 
