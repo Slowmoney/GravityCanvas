@@ -43,42 +43,40 @@ function main() {
 
 
     window.canvas = document.getElementById("canvas");
+    window.canvas.width = document.querySelector("body").offsetWidth - 10;
+    window.canvas.height = innerHeight - 21;
     window.ctx = window.canvas.getContext("2d");
-
-
-
-
-
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //drawCircle(obj[0].x, obj[0].y, 4);
     window.obj = [];
-    // window.obj.push(new Shape({ "mass": 100, x: 500, y: 500, vx: 0, vy:1, ax: 0, ay: 0 , radius : 1}));
-    // window.obj.push(new Shape({ "mass": 1000, x: 600, y: 500, vx: 0, vy: 0, ax: 0, ay: 0 , radius : 1}));
     var hold = 0;
     var preve;
+
     requestAnimationFrame(update);
     window.canvas.addEventListener("mousedown", e => {
-        try {
+        
             hold = new Date().getTime();
             preve = e;
-            objectsToDraw = [e.offsetX, e.offsetY];
-
-        } catch (error) {
-
-        }
+            objectsToDraw.line.xy =  [e.offsetX, e.offsetY];
+            objectsToDraw.line.draw = true; ///////
+            objectsToDraw.test.obj = new Shape({ "mass": 1, x: e.offsetX, y: e.offsetY, vx: 0, vy: 0, ax: 0, ay: 0, radius: 0 });
+            window.obj.push(objectsToDraw.test.obj);
+        
 
     });
     window.canvas.addEventListener("mousemove", e => {
-        try {
-            //objectsToDraw = [preve.clientX - 10, preve.clientY - 10];
-            objectsToDraw[2] = e.offsetX;
-            objectsToDraw[3] = e.offsetY;
-            //    requestAnimationFrame(update)
-            // console.log(e);
-            //   drawLine(preve.clientX - 10, preve.clientY - 10, e.clientX - 10, e.clientY - 10);
-        } catch (error) {
+        
 
-        }
+          if( objectsToDraw.line.draw){
+            objectsToDraw.line.xy[2] = e.offsetX;
+            objectsToDraw.line.xy[3] = e.offsetY;
+            let size = (new Date().getTime() - hold) / 100;
+           
+            objectsToDraw.test.obj.m = size;
+            objectsToDraw.test.obj.r = size;
+            //objectsToDraw.test.obj.vx = (e.offsetX - preve.offsetX) / 2;
+           // objectsToDraw.test.obj.vy = (e.offsetY - preve.offsetY) / 2;
+         
+
+          }
         if (!anim) {
             //    requestAnimationFrame(update);
         }
@@ -86,17 +84,12 @@ function main() {
     });
     window.canvas.addEventListener("mouseup", e => {
         let size = (new Date().getTime() - hold) / 100;
-
-        objectsToDraw[0] = 0;
-        objectsToDraw[1] = 0;
-        //console.log(size);
-        //  console.log(e,preve);
-
-        //  console.log(e.clientX-preve.clientX);
-        //  console.log(e.clientY-preve.clientY);
-        window.obj.push(new Shape({ "mass": size, x: preve.offsetX, y: preve.offsetY, vx: (e.offsetX - preve.offsetX) / 2, vy: (e.offsetY - preve.offsetY) / 2, ax: 0, ay: 0, radius: size }));
-
-
+        objectsToDraw.line.draw = false;
+        console.log(objectsToDraw.test.obj);
+        objectsToDraw.test.obj.vx = (e.offsetX - preve.offsetX) / 2;
+         objectsToDraw.test.obj.vy = (e.offsetY - preve.offsetY) / 2;
+        //window.obj.push(objectsToDraw.test.obj);
+       // window.obj.push(new Shape({ "mass": size, x: preve.offsetX, y: preve.offsetY, vx: (e.offsetX - preve.offsetX) / 2, vy: (e.offsetY - preve.offsetY) / 2, ax: 0, ay: 0, radius: size }));
     });
     document.addEventListener("keydown", e => {
 
@@ -151,7 +144,16 @@ window.countFPS = (function () {
 
 
 var T = 0.1;
-var objectsToDraw = [0, 0, 0, 0];
+var objectsToDraw = {
+    "line": {
+        "xy": [0, 0, 0, 0],
+        "draw": false
+    },
+    "test": {
+        "obj": 0,
+        "draw": false
+    }
+};
 
 
 function update(dt) {
@@ -161,9 +163,9 @@ function update(dt) {
     ctx.fillStyle = 'rgba(8,8, 255, 0.6)';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
-    if (objectsToDraw[0] != 0) {
+    if (objectsToDraw.line.draw) {
 
-        drawLine(objectsToDraw[0], objectsToDraw[1], objectsToDraw[2], objectsToDraw[3]);
+        drawLine(objectsToDraw.line.xy[0], objectsToDraw.line.xy[1], objectsToDraw.line.xy[2], objectsToDraw.line.xy[3]);
     }
     moveWithGravity(T, window.obj);
     for (let o of window.obj) {
@@ -184,7 +186,6 @@ function update(dt) {
 }
 
 function drawCircle(x, y, r) {
-
     window.ctx.beginPath();
     window.ctx.arc(x, y, r, 0, Math.PI * 2, true);
     window.ctx.stroke();
@@ -194,22 +195,16 @@ function drawLine(x1, y1, x2, y2) {
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
-
 }
 
 function updatePos(dt) {
     let r = Math.sqrt((obj[1].x - obj[0].x) ** 2 + (obj[1].y - obj[0].y) ** 2)
     obj[1].ax = G * obj[0].mass * (obj[0].x - obj[1].x) / Math.pow(r, 3)
     obj[1].ay = G * obj[0].mass * (obj[0].y - obj[1].y) / Math.pow(r, 3)
-
     obj[1].vx += dt * obj[1].ax;
     obj[1].vy += dt * obj[1].ay;
-
     obj[1].x += dt * obj[1].vx
     obj[1].y += dt * obj[1].vy
-
-
-
 }
 
 function checkCollision(o) {
@@ -224,15 +219,15 @@ function checkCollision(o) {
                 if (d < o1.r + o2.r) {
 
 
-                    let impulse1x = o1.m * o1.vx;
-                    let impulse1y = o1.m * o1.vy;
-                    let impulse2x = o2.m * o2.vx;
-                    let impulse2y = o2.m * o2.vy;
-
-                    let dimpx = impulse1x + impulse2x;
-                    let dimpy = impulse1y + impulse2y;
-                    let newvx = dimpx / (o1.m + o2.m);
-                    let newvy = dimpy / (o1.m + o2.m);
+                    /*   let impulse1x = o1.m * o1.vx;
+                       let impulse1y = o1.m * o1.vy;
+                       let impulse2x = o2.m * o2.vx;
+                       let impulse2y = o2.m * o2.vy;
+   
+                       let dimpx = impulse1x + impulse2x;
+                       let dimpy = impulse1y + impulse2y;
+                       let newvx = dimpx / (o1.m + o2.m);
+                       let newvy = dimpy / (o1.m + o2.m);*/
 
 
                     let fi = 0;
@@ -271,18 +266,18 @@ function checkCollision(o) {
             }
 
         }
-        /*   if ((o1.y > canvas.width)) {
-               o1.vy = -o1.vy;
-           }
-           if ((o1.x > canvas.width)) {
-               o1.vx = -o1.vx;
-           }
-           if ((o1.y < 0)) {
-               o1.vy = -o1.vy;
-           }
-           if ((o1.x < 0)) {
-               o1.vx = -o1.vx;
-           }*/
+        if ((o1.y > canvas.height)) {
+            o1.vy = -o1.vy;
+        }
+        if ((o1.x > canvas.width)) {
+            o1.vx = -o1.vx;
+        }
+        if ((o1.y < 0)) {
+            o1.vy = -o1.vy;
+        }
+        if ((o1.x < 0)) {
+            o1.vx = -o1.vx;
+        }
     }
 }
 
@@ -332,7 +327,7 @@ class Shape {
         }
         this.track.push([this.x, this.y]);
 
-       
+
 
         try {
             ctx.beginPath();
